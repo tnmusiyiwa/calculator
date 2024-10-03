@@ -1,4 +1,14 @@
-<h4>Enter expression and click Calculate</h4>
-<input [(ngModel)]="expression" />
-<p>{{ answer }}</p>
-<button (click)="submit()">Calculate</button>
+<h4 class="title">Enter expression and click Calculate</h4>
+<div class="container">
+  <p>
+    Enter only numbers and brackets () or for square root use 'sqrt' for
+    example, 'sqrt(9)'
+  </p>
+  <input
+    [(ngModel)]="expression"
+    class="input"
+    placeholder="Enter expression to evaluated here"
+  />
+  <p class="answer">{{ answer }}</p>
+  <button class="button" (click)="submit()">Calculate</button>
+</div>

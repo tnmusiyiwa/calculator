@@ -9,11 +9,21 @@ import { CalculatorService } from './calculator.service';
 export class AppComponent {
   title = 'calculator';
   expression = '';
-  answer!: number;
+  answer!: number | string;
 
   constructor(private readonly calculatorService: CalculatorService) {}
 
   submit() {
-    this.answer = this.calculatorService.evaluationExpression(this.expression);
+    try {
+      this.answer = this.calculatorService.evaluationExpression(
+        this.expression
+      );
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.answer = error.message;
+      } else {
+        this.answer = 'An unknown error occurred';
+      }
+    }
   }
 }

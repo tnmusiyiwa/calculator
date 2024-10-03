@@ -9,7 +9,23 @@ export class CalculatorService {
   constructor() {}
 
   evaluationExpression(expression: string): number {
-    return this.parseFormulaExpression(expression);
+    try {
+      // Validate expression for non-numeric characters and mismatched brackets
+      if (!this.isValidExpression(expression)) {
+        throw new Error(
+          'Invalid expression. Please ensure it contains only numbers, operators, and parentheses.'
+        );
+      }
+
+      return this.parseFormulaExpression(expression);
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error(error.message);
+      } else {
+        console.error('An unknown error occurred');
+      }
+      return NaN;
+    }
   }
 
   // Function to split by operator
@@ -43,10 +59,12 @@ export class CalculatorService {
 
   // Functions to perform calculations per each operator
   parseFormulaExpression(expression: string): number {
-    console.log(expression);
-    const numberString = this.split(expression, '+');
+    if (expression.startsWith('sqrt(')) {
+      const innerExpression = expression.substring(5, expression.length - 1);
+      return Math.sqrt(this.parseFormulaExpression(innerExpression));
+    }
 
-    console.log(numberString);
+    const numberString = this.split(expression, '+');
 
     const numbers = numberString.map((noStr) =>
       this.parseMinusExpression(noStr)
@@ -89,8 +107,6 @@ export class CalculatorService {
       if (strNum[0] === '(') {
         const expr = strNum.substr(1, strNum.length - 2);
 
-        console.log(strNum);
-        console.log(expr);
         return this.parseFormulaExpression(expr);
       }
       return +strNum;
@@ -101,5 +117,30 @@ export class CalculatorService {
       : numbers[1] !== 0
       ? numbers[0] / numbers[1]
       : 0;
+  }
+
+  // Function to validate expression
+  isValidExpression(expression: string): boolean {
+    // Check for non-numeric characters
+    if (
+      /[^0-9\+\-\*/()\.]/.test(expression) &&
+      expression.substring(0, 4) !== 'sqrt'
+    ) {
+      return false;
+    }
+
+    // Check for mismatched brackets
+    let bracketCount = 0;
+    for (let i = 0; i < expression.length; i++) {
+      if (expression[i] === '(') {
+        bracketCount++;
+      } else if (expression[i] === ')') {
+        bracketCount--;
+      }
+      if (bracketCount < 0) {
+        return false;
+      }
+    }
+    return bracketCount === 0;
   }
 }
